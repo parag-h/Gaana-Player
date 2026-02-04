@@ -41,16 +41,15 @@ async def download_image(image_url: str, image_path: str):
         print(f"❌ Image Download Failed: {e}")
 
 def run_ffmpeg_task(url: str, file_path: str):
+    # This points to the exact location where your .sh script saves ffmpeg
+    ffmpeg_exe = os.path.join(os.getcwd(), "ffmpeg_bin", "ffmpeg")
+    
     command = [
-        "ffmpeg", "-y", "-user_agent", 
+        ffmpeg_exe, "-y", "-user_agent", 
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36",
         "-i", url, "-c:a", "libmp3lame", "-q:a", "2", file_path
     ]
-    try:
-        subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print(f"✅ Audio Download Finished: {file_path}")
-    except Exception as e:
-        print(f"❌ FFmpeg Failed: {e}")
+    # ... rest of your code
 
 @app.get("/songs/search/")
 async def search(query: str):
@@ -95,5 +94,6 @@ from fastapi.responses import FileResponse
 @app.get("/")
 async def read_index():
     return FileResponse('index.html')
+
 
 
