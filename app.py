@@ -97,9 +97,15 @@ if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
 from fastapi.responses import FileResponse
 
+from fastapi.staticfiles import StaticFiles
+
+# This tells FastAPI to look for style.css, script.js, etc. in your root folder
+app.mount("/static", StaticFiles(directory="."), name="static")
+
 @app.get("/")
 async def read_index():
     return FileResponse('index.html')
+
 
 
 
