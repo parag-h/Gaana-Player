@@ -60,7 +60,7 @@ def run_ffmpeg_task(url: str, file_path: str):
 @app.get("/songs/search/")
 async def search(query: str):
     # Pass arguments positionally: first is query, second is limit
-    return await app.state.gaanapy.search_songs(query, 10)
+    return await app.state.gaanapy.search_songs(query, 30)
 
 @app.get("/download")
 async def download(url: str, title: str, art_url: str, tasks: BackgroundTasks):
@@ -105,6 +105,7 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 @app.get("/")
 async def read_index():
     return FileResponse('index.html')
+
 
 
 
