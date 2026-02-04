@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GaanaPy Pro Player</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+    <div class="box">
+        <h3>🔍 Search</h3>
+        <input type="text" id="q" placeholder="Enter song name...">
+        <button type="button" onclick="doSearch()">Search</button>
+        <div id="results"></div>
+    </div>
+
+    <div class="box">
+        <h3>📁 Library <button type="button" onclick="getLib()" style="background:#444; font-size: 11px;">Refresh</button></h3>
+        <div id="lib"></div>
+    </div>
+
+    <div id="p-bar">
+        <div class="player-content">
+            <img id="current-art" src="" alt="">
+            <div style="text-align: left; min-width: 180px;">
+                <strong id="playing-title">Title</strong><br>
+                <small id="playing-artist" style="color:#aaa">Artist</small>
+            </div>
+            <audio id="audio" controls></audio>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
