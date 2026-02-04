@@ -1,106 +1,49 @@
-const API = "http://127.0.0.1:8000";
+const API = "https://your-app-name.onrender.com"; // Replace with your Render URL
 const audio = document.getElementById('audio');
 let hls = new Hls();
 
 async function doSearch() {
-    const query = document.getElementById('q').value;
-    const resultsDiv = document.getElementById('results');
-    if(!query) return;
-
-    resultsDiv.innerHTML = "<p>Searching...</p>";
+    const q = document.getElementById('q').value;
+    const resDiv = document.getElementById('results');
+    if(!q) return;
+    resDiv.innerHTML = "Searching...";
 
     try {
-        const response = await fetch(`${API}/songs/search/?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        resultsDiv.innerHTML = '';
+        const res = await fetch(`${API}/songs/search/?query=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        resDiv.innerHTML = '';
 
         data.forEach(s => {
-            const coverUrl = s.images.urls.small_artwork;
+            const art = s.images.urls.small_artwork;
+            const url = s.stream_urls.urls.very_high_quality;
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
-                <img src="${coverUrl}" class="album-art">
-                <div class="song-details">
-                    <strong>${s.title}</strong><br>
-                    <small style="color:#888">${s.artists}</small>
-                </div>
-                <button type="button" class="play-btn" style="background:#2ecc71; margin-right:5px;">▶️ Play</button>
-                <button type="button" class="dl-btn">⬇️ Save</button>
+                <img src="${art}" class="album-art">
+                <div class="song-details"><strong>${s.title}</strong><br><small>${s.artists}</small></div>
+                <button type="button" class="play-btn" style="background:#2ecc71">▶️</button>
+                <button type="button" class="dl-btn">⬇️</button>
             `;
             
-            div.querySelector('.play-btn').onclick = () => {
-                updatePlayerUI(s.title, s.artists, coverUrl);
-                playStream(s.stream_urls.urls.very_high_quality);
-            };
-
-            div.querySelector('.dl-btn').onclick = () => doDl(s.stream_urls.urls.very_high_quality, s.title, coverUrl);
-            resultsDiv.appendChild(div);
+            div.querySelector('.play-btn').onclick = () => playS(url, s.title, s.artists, art);
+            div.querySelector('.dl-btn').onclick = () => doDl(url, s.title, art);
+            resDiv.appendChild(div);
         });
-    } catch (err) {
-        resultsDiv.innerHTML = "<p>Search Error. Is the backend running?</p>";
-    }
+    } catch (e) { resDiv.innerHTML = "Error: Check API URL"; }
 }
 
-async function doDl(url, title, artUrl) {
-    alert("Downloading: " + title);
-    try {
-        await fetch(`${API}/download?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&art_url=${encodeURIComponent(artUrl)}`);
-    } catch (err) {
-        console.error("Download failed", err);
-    }
+async function doDl(url, title, art) {
+    alert("Download started!");
+    await fetch(`${API}/download?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&art_url=${encodeURIComponent(art)}`);
 }
 
-async function getLib() {
-    try {
-        const res = await fetch(`${API}/library`);
-        const libraryData = await res.json();
-        const libDiv = document.getElementById('lib');
-        libDiv.innerHTML = '';
-
-        libraryData.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'item';
-            const localArt = `${API}/offline/${encodeURIComponent(item.art)}`;
-            
-            div.innerHTML = `
-                <img src="${localArt}" class="album-art" onerror="this.src='https://cdn-icons-png.flaticon.com/512/26/26230.png'">
-                <div class="song-details"><strong>${item.filename}</strong></div>
-                <button type="button" style="background:#2ecc71" onclick="playOff('${item.filename}', '${localArt}')">▶️ Play</button>
-            `;
-            libDiv.appendChild(div);
-        });
-    } catch (err) { console.error("Library load error", err); }
-}
-
-function updatePlayerUI(title, artist, art) {
+function playS(url, t, a, img) {
     document.getElementById('p-bar').style.display = 'block';
-    document.getElementById('playing-title').innerText = title;
-    document.getElementById('playing-artist').innerText = artist;
-    document.getElementById('current-art').src = art;
-}
-
-function playStream(url) {
+    document.getElementById('p-title').innerText = t;
+    document.getElementById('p-art').src = img;
     if(hls) hls.destroy();
-    if (Hls.isSupported() && url.includes('.m3u8')) {
-        hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(audio);
+    if(url.includes('.m3u8')) {
+        hls = new Hls(); hls.loadSource(url); hls.attachMedia(audio);
         hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
-    } else {
-        audio.src = url;
-        audio.play();
-    }
+    } else { audio.src = url; audio.play(); }
 }
-
-function playOff(fileName, artUrl) {
-    updatePlayerUI(fileName, "Offline Library", artUrl);
-    if(hls) {
-        hls.destroy();
-        hls = new Hls(); 
-    }
-    audio.src = `${API}/offline/${encodeURIComponent(fileName)}`;
-    audio.load();
-    audio.play();
-}
-
-window.onload = getLib;
