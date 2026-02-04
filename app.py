@@ -49,7 +49,13 @@ def run_ffmpeg_task(url: str, file_path: str):
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36",
         "-i", url, "-c:a", "libmp3lame", "-q:a", "2", file_path
     ]
-    # ... rest of your code
+    
+    # YOU NEED THIS PART:
+    try:
+        subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print(f"✅ Audio Download Finished: {file_path}")
+    except Exception as e:
+        print(f"❌ FFmpeg Failed: {e}")
 
 @app.get("/songs/search/")
 async def search(query: str):
@@ -94,6 +100,7 @@ from fastapi.responses import FileResponse
 @app.get("/")
 async def read_index():
     return FileResponse('index.html')
+
 
 
 
