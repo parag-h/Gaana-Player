@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from gaanapy import GaanaPy
+from api.gaanapy import GaanaPy
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -90,3 +90,4 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
