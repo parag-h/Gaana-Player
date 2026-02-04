@@ -1,4 +1,4 @@
-const API = "https://your-app-name.onrender.com"; // Replace with your Render URL
+const API = "https://gaana-player-parag.onrender.com";
 const audio = document.getElementById('audio');
 let hls = new Hls();
 
@@ -47,3 +47,4 @@ function playS(url, t, a, img) {
         hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
     } else { audio.src = url; audio.play(); }
 }
+
